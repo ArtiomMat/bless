@@ -7,10 +7,13 @@ fn main() {
 
     scr.write(|scr: &mut Screen, _: &()| {
         let mut x = Glyph::from('$');
-        x.fl |= GLYPH_BLINK;
+        x.fl |= GLYPH_ITALIC;
         x.bg = Color::DRed;
+        x.fg = Color::RGB(128, 255, 0);
         
         scr.set(&x, 2,2);
+        
+        scr.set(&x, 3,2);
     }, &()).unwrap();
 
     scr.flush().unwrap();

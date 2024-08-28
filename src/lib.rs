@@ -8,6 +8,18 @@ mod term;
 pub use crate::error::Error;
 pub use crate::term::*;
 
+pub const GLYPH_BOLD: u8 = 0b1;
+/// Gives the light version of the font, if available.
+pub const GLYPH_LIGHT: u8 = 0b10;
+/// Not supported everywhere.
+pub const GLYPH_ITALIC: u8 = 0b100;
+/// Underline.
+pub const GLYPH_LINE: u8 = 0b1000;
+/// Strike-through.
+pub const GLYPH_STRIKE: u8 = 0b10000;
+/// Blink a library defined time.
+pub const GLYPH_BLINK: u8 = 0b100000;
+
 #[derive(Copy, Clone, PartialEq)]
 pub enum Color {
     Default,
@@ -29,18 +41,10 @@ pub enum Color {
     DPurple,
     DCyan,
     DWhite,
+    
+    /// Full RGB, may not be supported always. You want to check with `can_rgb()`.
+    RGB(u8,u8,u8),
 }
-
-pub const GLYPH_BOLD: u8 = 0b1;
-/// Gives the light version of the font, if available.
-pub const GLYPH_LIGHT: u8 = 0b10;
-pub const GLYPH_ITALIC: u8 = 0b100;
-/// Underline.
-pub const GLYPH_LINE: u8 = 0b1000;
-/// Strike-through.
-pub const GLYPH_STRIKE: u8 = 0b10000;
-/// Blink a library defined time.
-pub const GLYPH_BLINK: u8 = 0b100000;
 
 #[derive(Copy, Clone)]
 pub struct Glyph {
@@ -120,52 +124,62 @@ impl Screen {
             }
             // Background color
             self.s.push_str("\x1B[0");
-            if g.bg != Color::Default {
-                self.s.push_str(match g.bg {
-                    Color::Black => ";100",
-                    Color::Red => ";101",
-                    Color::Green => ";102",
-                    Color::Yellow => ";103",
-                    Color::Blue => ";104",
-                    Color::Purple => ";105",
-                    Color::Cyan => ";106",
-                    Color::White => ";107",
-        
-                    Color::DBlack => ";40",
-                    Color::DRed => ";41",
-                    Color::DGreen => ";42",
-                    Color::DYellow => ";43",
-                    Color::DBlue => ";44",
-                    Color::DPurple => ";45",
-                    Color::DCyan => ";46",
-                    Color::DWhite => ";47",
-                    
-                    _ => "",
-                });
+            
+            // Background color
+            match g.bg {
+                Color::Black => { self.s.push_str(";100"); },
+                Color::Red => { self.s.push_str(";101"); },
+                Color::Green => { self.s.push_str(";102"); },
+                Color::Yellow => { self.s.push_str(";103"); },
+                Color::Blue => { self.s.push_str(";104"); },
+                Color::Purple => { self.s.push_str(";105"); },
+                Color::Cyan => { self.s.push_str(";106"); },
+                Color::White => { self.s.push_str(";107"); },
+    
+                Color::DBlack => { self.s.push_str(";40"); },
+                Color::DRed => { self.s.push_str(";41"); },
+                Color::DGreen => { self.s.push_str(";42"); },
+                Color::DYellow => { self.s.push_str(";43"); },
+                Color::DBlue => { self.s.push_str(";44"); },
+                Color::DPurple => { self.s.push_str(";45"); },
+                Color::DCyan => { self.s.push_str(";46"); },
+                Color::DWhite => { self.s.push_str(";47"); },
+
+                Color::RGB(r,g,b) => {
+                    self.s.push_str(
+                        format!(";48;2;{};{};{}", r,g,b).as_str()
+                    );
+                },
+
+                _ => {}
             }
             // Foreground color
-            if g.fg != Color::Default {
-                self.s.push_str(match g.fg {
-                    Color::Black => ";90",
-                    Color::Red => ";91",
-                    Color::Green => ";92",
-                    Color::Yellow => ";93",
-                    Color::Blue => ";94",
-                    Color::Purple => ";95",
-                    Color::Cyan => ";96",
-                    Color::White => ";97",
+            match g.fg {
+                Color::Black => { self.s.push_str(";90"); },
+                Color::Red => { self.s.push_str(";91"); },
+                Color::Green => { self.s.push_str(";92"); },
+                Color::Yellow => { self.s.push_str(";93"); },
+                Color::Blue => { self.s.push_str(";94"); },
+                Color::Purple => { self.s.push_str(";95"); },
+                Color::Cyan => { self.s.push_str(";96"); },
+                Color::White => { self.s.push_str(";97"); },
 
-                    Color::DBlack => ";30",
-                    Color::DRed => ";31",
-                    Color::DGreen => ";32",
-                    Color::DYellow => ";33",
-                    Color::DBlue => ";34",
-                    Color::DPurple => ";35",
-                    Color::DCyan => ";36",
-                    Color::DWhite => ";37",
+                Color::DBlack => { self.s.push_str(";30"); },
+                Color::DRed => { self.s.push_str(";31"); },
+                Color::DGreen => { self.s.push_str(";32"); },
+                Color::DYellow => { self.s.push_str(";33"); },
+                Color::DBlue => { self.s.push_str(";34"); },
+                Color::DPurple => { self.s.push_str(";35"); },
+                Color::DCyan => { self.s.push_str(";36"); },
+                Color::DWhite => { self.s.push_str(";37"); },
 
-                    _ => ""
-                });
+                Color::RGB(r,g,b) => {
+                    self.s.push_str(
+                        format!(";38;2;{};{};{}", r,g,b).as_str()
+                    );
+                },
+
+                _ => {}
             }
             // Flags
             if g.fl & GLYPH_BOLD != 0 {
