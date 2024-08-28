@@ -5,6 +5,11 @@ fn main() {
 
     let mut scr = Screen::new();
 
+    if !bless::can_rgb() {
+        println!("Can't rgb!");
+        return;
+    }
+
     scr.write(|scr: &mut Screen, _: &()| {
         let mut x = Glyph::from('$');
         x.fl |= GLYPH_ITALIC;
