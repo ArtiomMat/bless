@@ -8,8 +8,6 @@ mod term;
 pub use crate::error::Error;
 pub use crate::term::*;
 
-use std::io::{self, Write};
-
 #[derive(Copy, Clone, PartialEq)]
 pub enum Color {
     Default,
@@ -205,15 +203,5 @@ pub fn show_cursor(yes: bool) {
         _ = write("\x1B[?25h");
     } else {
         _ = write("\x1B[?25l");
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        
     }
 }
