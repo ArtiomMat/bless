@@ -1,0 +1,13 @@
+[package]
+name = "bless"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lazy_static = "1.5.0"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+winapi = "0.3"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
